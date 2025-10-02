@@ -1,18 +1,15 @@
-/*
-Предупреждение: обязательно запустите файл "qualit-sandbox.jar" перед запуском программы.
-
-HTTP статус коды: https://http.cat/
-Swagger UI: http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/%D0%A2%D0%BE%D0%B2%D0%B0%D1%80%D1%8B/create
-*/
-
 package org.ibs;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
-import static io.restassured.RestAssured.*;
 
+import static io.restassured.RestAssured.given;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RestTest {
+
+    private static String jsessionId;
 
     @BeforeAll
     static void openFood() {
@@ -24,9 +21,18 @@ public class RestTest {
                     .then()
                     .statusCode(200);
             System.out.println("-Сервер доступен-");
+
+            // JSESSIONID с /food (чтобы POST и GET работали в одной сессии)
+            jsessionId = given()
+                    .when()
+                    .get("/food")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .cookie("JSESSIONID");
+
         } catch (Exception e) {
             System.out.println("Сервер недоступен! Запустите qualit-sandbox.jar");
-            throw new RuntimeException("Сервер недоступен", e);
         }
     }
 
@@ -75,6 +81,8 @@ public class RestTest {
         String jsonBody = "{\"name\": \"" + name + "\", \"type\": \"" + type + "\", \"exotic\": " + exotic + "}";
 
         Response response = given()
+                .baseUri("http://localhost:8080")
+                .cookie("JSESSIONID", jsessionId)
                 .contentType("application/json")
                 .accept("application/json")
                 .body(jsonBody)
@@ -85,8 +93,6 @@ public class RestTest {
 
         if (statusCode == 200) {
             printGreen("Успешно добавлены: " + name + " | " + type + " | " + exotic);
-            printBlue("   Статус код: " + statusCode);
-
         } else {
             printRed("Не добавлены: " + name + " | " + type + " | " + exotic);
             printPurple("   Ответ сервера: " + response.getBody().asString());
@@ -95,8 +101,9 @@ public class RestTest {
     }
 
     void getAllFood() {
-        // Получаем список товаров
         Response response = given()
+                .baseUri("http://localhost:8080")
+                .cookie("JSESSIONID", jsessionId)
                 .accept("application/json")
                 .when()
                 .get("/api/food");
@@ -119,33 +126,10 @@ public class RestTest {
         }
     }
 
-    // Метод для зелёного текста
-    void printGreen(String text) {
-        System.out.println("\u001B[32m" + text + "\u001B[0m");
-    }
-
-    // Метод для красного текста
-    void printRed(String text) {
-        System.out.println("\u001B[31m" + text + "\u001B[0m");
-    }
-
-    // Метод для фиолетового текста
-    void printPurple(String text) {
-        System.out.println("\u001B[35m" + text + "\u001B[0m");
-    }
-
-    // Метод для голубого цвета
-    void printBlue(String text) {
-        System.out.println("\u001B[36m" + text + "\u001B[0m");
-    }
-
-    // Метод для желтого цвета
-    void printYellow(String text) {
-        System.out.println("\u001B[33m" + text + "\u001B[0m");
-    }
-
-    // Метод для бирюзового цвета
-    void printCyan(String text) {
-        System.out.println("\u001B[96m" + text + "\u001B[0m");
-    }
+    void printGreen(String text) { System.out.println("\u001B[32m" + text + "\u001B[0m"); }
+    void printRed(String text) { System.out.println("\u001B[31m" + text + "\u001B[0m"); }
+    void printPurple(String text) { System.out.println("\u001B[35m" + text + "\u001B[0m"); }
+    void printBlue(String text) { System.out.println("\u001B[36m" + text + "\u001B[0m"); }
+    void printYellow(String text) { System.out.println("\u001B[33m" + text + "\u001B[0m"); }
+    void printCyan(String text) { System.out.println("\u001B[96m" + text + "\u001B[0m"); }
 }
