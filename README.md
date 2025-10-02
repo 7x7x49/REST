@@ -3,11 +3,11 @@
 # **Описание**  
 Обязательно запустите файл "qualit-sandbox.jar" перед работой с программой! Он находится в папке проекта.   
    
-После запуска программы в консоль выводится информация о тестовых данных, описанных в коде, ответ сервера (если продукт не добавлен) и статус код.   
+После запуска программы в консоль выводится информация о тестовых данных, описанных в коде, ответ сервера (если продукт не добавлен), статус код, начальный и финальный списки товаров.   
     
-Пример:   
+Изображение:   
 
-![daftar](https://i.postimg.cc/cCgCvXV1/image.png)
+![daftar](https://i.postimg.cc/YCcvkppY/image.png)
 # **Использованные средства**  
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)   
 ![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000.svg?style=for-the-badge&logo=intellij-idea&logoColor=white)   
