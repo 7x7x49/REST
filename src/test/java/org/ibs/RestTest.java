@@ -30,17 +30,6 @@ public class RestTest {
         }
     }
 
-    @BeforeEach
-    void clearDatabase() {
-        // Очищаем базу данных перед каждым тестом
-        given()
-                .when()
-                .post("/api/data/reset")
-                .then()
-                .statusCode(200);
-        System.out.println("База данных очищена");
-    }
-
     @Test
     void testFoodAPI() {
         // Получаем начальный список товаров
