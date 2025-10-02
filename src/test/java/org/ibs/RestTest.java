@@ -26,7 +26,19 @@ public class RestTest {
             System.out.println("-Сервер доступен-");
         } catch (Exception e) {
             System.out.println("Сервер недоступен! Запустите qualit-sandbox.jar");
+            throw new RuntimeException("Сервер недоступен", e);
         }
+    }
+
+    @BeforeEach
+    void clearDatabase() {
+        // Очищаем базу данных перед каждым тестом
+        given()
+                .when()
+                .post("/api/data/reset")
+                .then()
+                .statusCode(200);
+        System.out.println("База данных очищена");
     }
 
     @Test
@@ -74,8 +86,9 @@ public class RestTest {
         String jsonBody = "{\"name\": \"" + name + "\", \"type\": \"" + type + "\", \"exotic\": " + exotic + "}";
 
         Response response = given()
-                .contentType("application/json") // Помечаем, что данные в JSON
-                .body(jsonBody) // Данные JSON
+                .contentType("application/json")
+                .accept("application/json")
+                .body(jsonBody)
                 .when()
                 .post("/api/food");
 
@@ -84,6 +97,7 @@ public class RestTest {
         if (statusCode == 200) {
             printGreen("Успешно добавлены: " + name + " | " + type + " | " + exotic);
             printBlue("   Статус код: " + statusCode);
+
         } else {
             printRed("Не добавлены: " + name + " | " + type + " | " + exotic);
             printPurple("   Ответ сервера: " + response.getBody().asString());
@@ -94,6 +108,7 @@ public class RestTest {
     void getAllFood() {
         // Получаем список товаров
         Response response = given()
+                .accept("application/json")
                 .when()
                 .get("/api/food");
 
@@ -103,8 +118,11 @@ public class RestTest {
             if (responseBody.contains("[]")) {
                 printBlue("Список товаров пуст.");
             } else {
-                printCyan("Список товаров:");
-                printCyan(responseBody);
+                String formattedBody = responseBody
+                        .replace("},{", "},\n{")
+                        .replace("[{", "[\n{")
+                        .replace("}]", "}\n]");
+                printCyan(formattedBody);
             }
         } else {
             printRed("Ошибка при получении списка товаров!");
