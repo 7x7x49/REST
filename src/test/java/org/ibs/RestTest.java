@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.given;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RestTest {
 
     private static String jsessionId;
